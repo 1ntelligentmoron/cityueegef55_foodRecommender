@@ -6,3 +6,4 @@ Lorem ipsum dolor sit amet
 
 # Credits
 1. [David T. Miller](https://github.com/davidtmiller) from [Start Bootstrap](https://github.com/StartBootstrap) for the [website UI template](https://github.com/startbootstrap/startbootstrap-clean-blog)
+2. Anyrgb for the [website favicon](https://www.anyrgb.com/en-clipart-ygdts)
