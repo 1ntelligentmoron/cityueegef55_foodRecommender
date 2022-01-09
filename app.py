@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect
 from markupsafe import escape
 from flask_wtf import CSRFProtect as CSRF
+from flask_wtf.csrf import CSRFError
 from secrets import token_urlsafe as key
 import backend
 app = Flask(__name__)
@@ -12,8 +13,9 @@ DOMAIN = 'http://127.0.0.1:5000'
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    errors = []
+    errors = []  # error messages
     
+    # Form submitted
     if request.method == 'POST':
         
         _budget = request.form.get('budget')
@@ -44,10 +46,20 @@ def main():
                 lat = escape(_lat),
                 long = escape(_long),
                 ai = backend.recommend(_budget, _range, _lat, _long))
-        
+    
+    # Chosen restaurant
+    r_id = request.args.get('r')
+    if r_id:
+        confirmation = backend.chosen(r_id)  # Send result to backend
+        errors.append(confirmation)
+    
+    # Render index.html if form not submitted (successfully)
     return render_template('index.html', errors=errors, num_errors=len(errors))
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    return render_template('csrf_error.html', reason=e.description), 400
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-    

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}CSRF Error{% endblock %}
+{% block subtitle %}Oops, your CSRF token has expired.{% endblock %}
+{% block main %}
+<p>
+    To fix the issue, click "FoodAR" (at the top left corner).<br>
+    If this happens again, restart your browser and use incognito mode.<br>
+    If the problem still persists, contact me.<br><br>
+    {{ reason }}
+</p>
+{% endblock %}
