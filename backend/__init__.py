@@ -1,19 +1,19 @@
 def recommend(budget, range, lat, long):
-    r1 = '[Restaurant 1]'
-    r2 = '[Restaurant 2]'
-    r3 = '[Restaurant 3]'
-    kw1 = ('[A1]', '[B1]')
-    kw2 = ('[A2]', '[B2]')
-    kw3 = ('[A3]', '[B3]')
-    addr1 = '[Address 1]'
-    addr2 = '[Address 2]'
-    addr3 = '[Address 3]'
-    coord1 = (0.0, 0.0)
-    coord2 = (0.0, 0.0)
-    coord3 = (0.0, 0.0)
-    r_id1 = 1
-    r_id2 = 2
-    r_id3 = 3
+    r1 = 'Lam Cheong Kee'
+    r2 = 'Pot & Plate'
+    r3 = 'Pacific Coffee Company'
+    kw1 = ('Hong Kong Style', 'Snack Shop & Deli')
+    kw2 = ('Taiwan', 'Japanese')
+    kw3 = ('Western', 'Salad')
+    addr1 = 'Shop 108A, 1/F, New East Ocean Centre, 9 Science Museum Road, Tsim Sha Tsui'
+    addr2 = 'Shop 756, 7/F, Fortune Metropolis, 6-10 Metropolis Drive, Hung Hom'
+    addr3 = 'Podium, Pao Yue-kong Library, The Hong Kong Polytechnic University, Hung Hom'
+    coord1 = (22.3015905, 114.1790255)
+    coord2 = (22.302663, 114.183191)
+    coord3 = (22.302516, 114.178928)
+    r_id1 = 4581
+    r_id2 = 6594
+    r_id3 = 4087
     return ((r1, kw1, addr1, coord1, r_id1), (r2, kw2, addr2, coord2, r_id2), (r3, kw3, addr3, coord3, r_id3))
 
 def chosen(r_id):
