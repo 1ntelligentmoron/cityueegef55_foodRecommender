@@ -1,6 +1,6 @@
 import openpyxl
-import geopy
-wb = openpyxl.load_workbook('r.xlsx', read_only=True)
+from geopy import distance
+wb = openpyxl.load_workbook('backend/r.xlsx', read_only=True)
 ws = wb.active
 
 
@@ -12,8 +12,6 @@ def info(id, as_output=False):
         'keywords': (None, None,),  # columns D, E
         'address': '',  # column F
         'coords': (None, None,),  # columns G, H
-        'rating': -1.0,  # column ALU
-        'rank': -1,  # column ALV
     }
     
     row = id + 1
@@ -34,10 +32,6 @@ def info(id, as_output=False):
     long = ws[f'H{row}'].value
     info['coords'] = (float(lat), float(long),)
     
-    info['rating'] = float(ws[f'ALU{row}'].value)
-    
-    info['rank'] = int(ws[f'ALV{row}'].value)
-    
     if as_output:
         return info['name'], info['keywords'], info['address'], info['coords'], id
     return info
@@ -50,16 +44,17 @@ def check(id, u_budget, u_range, u_lat, u_long):
         u_brange = 1
     elif 50 <= u_budget < 100:
         u_brange = 2
-    elif 100 <= u_brange < 200:
+    elif 100 <= u_budget < 200:
         u_brange = 3
-    elif 200 <= u_brange < 400:
+    elif 200 <= u_budget < 400:
         u_brange = 4
-    elif 400 <= u_brange < 800:
+    elif 400 <= u_budget < 800:
         u_brange = 5
     else:
         u_brange = 6
     
     ok_budget = info(id)['b_range'] <= u_brange  # Check budget
-    ok_range = round(geopy.distance.distance((u_lat, u_long), info(id)['coords']).km, 1) <= u_range  # Check in range
+    ok_range = round(distance.distance((u_lat, u_long), info(id)['coords']).km, 1) <= u_range  # Check in range
+    print('Budget OK: {}\nRange OK: {}'.format(ok_budget, ok_range))
     
     return ok_budget and ok_range

@@ -2,12 +2,12 @@ import numpy as np
 import scipy.sparse as sps
 import scipy.optimize as opt
 import numpy.linalg as nla
-from nonnegfac import matrix_utils as mu
+from backend.nonnegfac import matrix_utils as mu
 import time
 import json
 from numpy import random
-from nonnegfac.nnls import nnlsm_activeset
-from nonnegfac.nnls import nnlsm_blockpivot
+from backend.nonnegfac.nnls import nnlsm_activeset
+from backend.nonnegfac.nnls import nnlsm_blockpivot
 
 
 class NMF_Base(object):

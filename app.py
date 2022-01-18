@@ -30,7 +30,7 @@ def main():
             try:
                 if round(float(_budget), 0) < 20:
                     errors.append('Budget must be at least HKD20!')
-                if not (1 <= round(float(_range), 0) <= 25):
+                if not (5 <= round(float(_range), 0) <= 25):
                     errors.append('Range must be between 1 and 25 km!')
                 if not (22.15 <= float(_lat) <= 22.58):
                     errors.append('Latitude must be in Hong Kong (22.15-22.58)!')
@@ -41,6 +41,10 @@ def main():
             
         
         if len(errors) == 0:
+            _budget = float(_budget)
+            _range = float(_range)
+            _lat = float(_lat)
+            _long = float(_long)
             ai = backend.recommend(_budget, _range, _lat, _long)
             if ai == 'CF_NOW':
                 return render_template('wait.html')
@@ -54,8 +58,11 @@ def main():
     # Chosen restaurant
     r_id = request.args.get('r')
     if r_id:
-        confirmation = backend.chosen(r_id)  # Send result to backend
-        errors.append(confirmation)
+        try:
+            confirmation = backend.chosen(int(r_id))  # Send result to backend
+            errors.append(confirmation)
+        except ValueError:
+            redirect('/')
     
     # Render index.html if form not submitted (successfully)
     return render_template('index.html', errors=errors, num_errors=len(errors))
@@ -66,4 +73,4 @@ def handle_csrf_error(e):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

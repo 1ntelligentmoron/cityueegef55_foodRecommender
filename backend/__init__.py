@@ -2,7 +2,7 @@ from backend import cf, r
 import pandas as pd
 import openpyxl
 from random import randint as rnd
-wb = openpyxl.load_workbook('r.xlsx')
+wb = openpyxl.load_workbook('backend/r.xlsx')
 ws = wb.active
 
 
@@ -19,17 +19,19 @@ def recommend(budget, range, lat, long):
     try:
         
         # Case 3
-        df = pd.read_csv('r_filled.csv')  # Raises FileNotFoundError if preference matrix not generated
+        df = pd.read_csv('backend/r_filled.csv', header=None)  # Raises FileNotFoundError if preference matrix not generated
         df = df.iloc[:, -1:]  # Extracting column storing user preference
         
         recs = []
         while len(recs) < 3:
             max_pos = df.idxmax().to_list()
-            df[max_pos] = 0
-            max_id = int(max_pos[1]) + 1
+            df[1000][max_pos] = 0
+            max_id = int(max_pos[0]) + 1
+            print('Finding {}/3 match(es), id={}'.format(len(recs)+1, max_id))
             if r.check(max_id, budget, range, lat, long):
                 recs.append(max_id)
-       
+                print('Found {}/3 match(es)'.format(len(recs)))
+    
     except FileNotFoundError:
         
         if not not ws['ALZ6'].value:  # not not x is faster than bool(x)
@@ -54,9 +56,11 @@ def recommend(budget, range, lat, long):
 
 def chosen(id):
     
+    info = r.info(id)
+    
     # Do nothing if preference matrix already generated
     try:
-        with open('r_filled.csv', 'r') as f:
+        with open('backend/r_filled.csv', 'r') as f:
             pass
     
     except FileNotFoundError:
@@ -75,10 +79,11 @@ def chosen(id):
                 continue  # Do not add 0.5 to chosen restaurant
             kw1 = ws[f'D{i}'].value
             kw2 = ws[f'E{i}'].value
-            kws_req = r.info(id)['keywords']
+            
+            kws_req = info['keywords']
             if kw1 in kws_req and kw2 in kws_req:  # If restaurant is related to chosen restaurant
                 rating_new_related = round(float(ws[f'ALU{i}'].value) + 0.5, 3)
                 if rating_new_related < 4.5:
                     ws[f'ALU{row}'] = rating_new_related
     
-    return 'You have chosen {} (Address: {}).'.format(r.info(id)['name'], r.info(id)['address'])
+    return 'You have chosen {} (Address: {}).'.format(info['name'], info['address'])
