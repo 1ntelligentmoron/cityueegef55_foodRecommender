@@ -1,20 +1,84 @@
+from backend import cf, r
+import pandas as pd
+import openpyxl
+from random import randint as rnd
+wb = openpyxl.load_workbook('r.xlsx')
+ws = wb.active
+
+
 def recommend(budget, range, lat, long):
-    r1 = 'Lam Cheong Kee'
-    r2 = 'Pot & Plate'
-    r3 = 'Pacific Coffee Company'
-    kw1 = ('Hong Kong Style', 'Snack Shop & Deli')
-    kw2 = ('Taiwan', 'Japanese')
-    kw3 = ('Western', 'Salad')
-    addr1 = 'Shop 108A, 1/F, New East Ocean Centre, 9 Science Museum Road, Tsim Sha Tsui'
-    addr2 = 'Shop 756, 7/F, Fortune Metropolis, 6-10 Metropolis Drive, Hung Hom'
-    addr3 = 'Podium, Pao Yue-kong Library, The Hong Kong Polytechnic University, Hung Hom'
-    coord1 = (22.3015905, 114.1790255)
-    coord2 = (22.302663, 114.183191)
-    coord3 = (22.302516, 114.178928)
-    r_id1 = 4581
-    r_id2 = 6594
-    r_id3 = 4087
+    
+    """
+    Three cases:
+    Case 1: user is new (indentified by the lack of 'r_filled.csv' in /backend/)
+    Case 2: user no longer a cold start problem (indicated by cell ALZ6 in 'r.xlsx')
+    Case 3: user's preference matrix (r_filled.csv) has been created
+    """
+    
+    # Test for case 1
+    try:
+        
+        # Case 3
+        df = pd.read_csv('r_filled.csv')  # Raises FileNotFoundError if preference matrix not generated
+        df = df.iloc[:, -1:]  # Extracting column storing user preference
+        
+        recs = []
+        while len(recs) < 3:
+            max_pos = df.idxmax().to_list()
+            df[max_pos] = 0
+            max_id = int(max_pos[1]) + 1
+            if r.check(max_id, budget, range, lat, long):
+                recs.append(max_id)
+       
+    except FileNotFoundError:
+        
+        if not not ws['ALZ6'].value:  # not not x is faster than bool(x)
+            # Case 2
+            cf.main()
+            return 'CF_NOW'
+            
+        else:
+            # Case 1
+            recs = []
+            while len(recs) < 3:
+                id = rnd(1, 5167)
+                if r.check(id, budget, range, lat, long):
+                    recs.append(id)
+    
+    r1, kw1, addr1, coord1, r_id1 = r.info(recs[0], True)
+    r2, kw2, addr2, coord2, r_id2 = r.info(recs[1], True)
+    r3, kw3, addr3, coord3, r_id3 = r.info(recs[2], True)
+    
     return ((r1, kw1, addr1, coord1, r_id1), (r2, kw2, addr2, coord2, r_id2), (r3, kw3, addr3, coord3, r_id3))
 
-def chosen(r_id):
-    return 'You have chosen restaurant ID#{}.'.format(r_id)
+
+def chosen(id):
+    
+    # Do nothing if preference matrix already generated
+    try:
+        with open('r_filled.csv', 'r') as f:
+            pass
+    
+    except FileNotFoundError:
+        
+        row = id + 1
+        
+        # Increase rating of chosen restaurant by 1.0, limited to 5.0
+        rating_new_chosen = round(float(ws[f'ALU{row}'].value) + 1.0, 3)
+        if rating_new_chosen > 5.0:
+            rating_new_chosen = 5.0
+        ws[f'ALU{row}'] = rating_new_chosen
+        
+        # Increase rating of related restaurant(s) by 0.5, limited to 4.0
+        for i in range(1, 5169):
+            if i == row:
+                continue  # Do not add 0.5 to chosen restaurant
+            kw1 = ws[f'D{i}'].value
+            kw2 = ws[f'E{i}'].value
+            kws_req = r.info(id)['keywords']
+            if kw1 in kws_req and kw2 in kws_req:  # If restaurant is related to chosen restaurant
+                rating_new_related = round(float(ws[f'ALU{i}'].value) + 0.5, 3)
+                if rating_new_related < 4.5:
+                    ws[f'ALU{row}'] = rating_new_related
+    
+    return 'You have chosen {} (Address: {}).'.format(r.info(id)['name'], r.info(id)['address'])

@@ -13,6 +13,7 @@ DOMAIN = 'http://127.0.0.1:5000'
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
+    
     errors = []  # error messages
     
     # Form submitted
@@ -40,12 +41,15 @@ def main():
             
         
         if len(errors) == 0:
+            ai = backend.recommend(_budget, _range, _lat, _long)
+            if ai == 'CF_NOW':
+                return render_template('wait.html')
             return render_template('choose.html',
-                budget = escape(_budget),
-                range = escape(_range),
-                lat = escape(_lat),
-                long = escape(_long),
-                ai = backend.recommend(_budget, _range, _lat, _long))
+                budget = round(_budget),
+                range = round(_range, 1),
+                lat = round(_lat, 4),
+                long = round(_long, 4),
+                ai = ai)
     
     # Chosen restaurant
     r_id = request.args.get('r')
@@ -62,4 +66,4 @@ def handle_csrf_error(e):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
