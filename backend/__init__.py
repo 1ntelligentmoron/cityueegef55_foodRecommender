@@ -36,8 +36,10 @@ def recommend(budget, range, lat, long):
         
         if not not ws['ALZ6'].value:  # not not x is faster than bool(x)
             # Case 2
-            cf.main()
-            return 'CF_NOW'
+            try:
+                return 'CF_NOW'
+            finally:
+                cf.main()
             
         else:
             # Case 1
