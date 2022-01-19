@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect
-from markupsafe import escape
+from flask import Flask, render_template, request, url_for
 from flask_wtf import CSRFProtect as CSRF
 from flask_wtf.csrf import CSRFError
 from secrets import token_urlsafe as key
@@ -46,8 +45,6 @@ def main():
             _lat = float(_lat)
             _long = float(_long)
             ai = backend.recommend(_budget, _range, _lat, _long)
-            if ai == 'CF_NOW':
-                return render_template('wait.html')
             return render_template('choose.html',
                 budget = round(_budget),
                 range = round(_range, 1),
