@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, redirect
 from flask_wtf import CSRFProtect as CSRF
 from flask_wtf.csrf import CSRFError
 from secrets import token_urlsafe as key
